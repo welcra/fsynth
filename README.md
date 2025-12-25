@@ -45,7 +45,7 @@ pip install fsynth
 Or build from source:
 
 ```bash
-git clone [https://github.com/welcra/fsynth.git](https://github.com/welcra/fsynth.git)
+git clone https://github.com/welcra/fsynth.git
 cd fsynth
 pip install -e .
 ```
@@ -56,32 +56,52 @@ pip install -e .
 
 ### 1. The Command Line Interface (CLI)
 
-The easiest way to generate a dataset is using the bundled CLI tool. This command generates 500 stocks over 10 years and saves the data to the `data/` folder.
+The easiest way to generate a dataset is using the bundled CLI tool. **New in v0.1.1:** You can now tune the Heston volatility and Jump Diffusion parameters directly from the command line to simulate different market conditions (e.g., "Crypto Winter" vs. "Stable Bull Market").
+
+**Generate a standard SPY-like dataset (Stable, rare crashes):**
 
 ```bash
-fsynth-gen --stocks 500 --years 10 --out data
+fsynth-gen --stocks 500 --years 10 --out data --theta 0.02 --lambda_j 0.05
 ```
 
-**Output:**
-* `data/market_index.parquet`: The macro-economic backbone (regimes, risk-free rates).
-* `data/stock_prices.parquet`: OHLCV data for all 500 tickers (~1.2M rows).
-* `data/fundamentals.parquet`: Quarterly financial reports for all tickers.
+**Generate a high-volatility "Crypto" dataset (Frequent 5% crashes):**
+
+```bash
+fsynth-gen --stocks 100 --years 5 --theta 0.10 --lambda_j 0.50 --crash_size -0.05
+```
+
+New CLI Flags:
+- ```--theta```: Baseline volatility (Long-run variance). Lower (0.02) = Stable, Higher (0.10) = Volatile.
+- ```--lambda_j```: Jump intensity (Expected jumps per year).
+- ```--crash_size```: Average size of a jump (e.g., -0.05 is -5%).
+- ```--crisis_prob```: Daily probability of switching to a high-correlation "Crisis" regime.
+
+Output:
+- ```data/market_index.parquet```: The macro-economic backbone (regimes, risk-free rates).
+- ```data/stock_prices.parquet```: OHLCV data for all 500 tickers (~1.2M rows).
+- ```data/fundamentals.parquet```: Quarterly financial reports for all tickers.
 
 ### 2. Python API
 
-For integration into your own scripts or data pipelines:
+For integration into your own scripts or data pipelines, MarketConfig now accepts dynamic parameters for fine-grained control:
 
 ```python
 from fsynth import MarketConfig, MarketSimulator, FundamentalGenerator
 import pandas as pd
 
-# 1. Configure the Simulation
+# 1. Configure the Simulation (v0.1.1 Update)
 config = MarketConfig(
     T=5,                # Years
     dt=1/252,           # Daily time steps
     n_stocks=100,       # Number of tickers
-    n_sectors=5,        # Distinct sectors with unique correlations
-    seed=42             # Reproducibility
+    n_sectors=5,        # Distinct sectors
+    seed=42,            # Reproducibility
+    
+    # -- New Tuning Parameters --
+    theta0=0.02,        # Low baseline volatility (SPY-like)
+    lambda_j=0.05,      # ~12 jumps per year
+    mu_j=-0.02,         # Average jump size is -2%
+    p_01=0.005          # 0.5% chance of entering Crisis regime daily
 )
 
 # 2. Run the Engine
@@ -165,4 +185,4 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
 
-**Built by [Arnav Malhotra](https://github.com/welcra).**
+**Built by [Arnav Malhotra](https://welcra.com/).**
