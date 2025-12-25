@@ -22,6 +22,20 @@ Designed for quantitative researchers, AI/ML engineers, and financial educators 
 
 ---
 
+## 📊 Why use fsynth? (The "Fat Tail" Problem)
+
+Standard financial models (Geometric Brownian Motion) assume market returns are Normally Distributed. They fail to capture "Black Swan" events.
+
+**fsynth is different.** It captures the "Fat Tails" (extreme crashes) observed in real markets.
+
+![Fat Tail Analysis](images/spy5y_fsynth.png)
+
+* **Real SPY Kurtosis:** ~8.04 (High risk of crash)
+* **Standard Model:** ~0.00 (Assumes crashes are impossible)
+* **fsynth Model:** ~5.81 (Successfully models crash risk)
+
+--
+
 ## 📦 Installation
 
 ```bash
