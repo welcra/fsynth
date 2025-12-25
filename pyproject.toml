@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fsynth"
+version = "0.1.0"
+description = "A high-performance synthetic financial data generator that uses Heston Stochastic Volatility and Jump Diffusion models."
+readme = "README.md"
+authors = [
+  { name = "Arnav Malhotra", email = "am@welcra.com" },
+]
+license = { text = "MIT" }
+requires-python = ">=3.9"
+dependencies = [
+    "numpy>=1.20.0",
+    "pandas>=1.5.0",
+    "numba>=0.56.0",
+    "pyarrow>=10.0.0"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Intended Audience :: Science/Research",
+    "Topic :: Office/Business :: Financial :: Investment",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+]
+[project.urls]
+"Homepage" = "https://github.com/welcra/fsynth"
+"Bug Tracker" = "https://github.com/welcra/fsynth/issues"
+
+[project.scripts]
+fsynth-gen = "fsynth.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
