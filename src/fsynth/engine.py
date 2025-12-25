@@ -49,6 +49,7 @@ def heston_regime_switching_kernel(
         
         curr_lambda = lambda_j * 3 if current_regime == 1 else lambda_j
         dn = np.random.poisson(curr_lambda * dt)
+        
         jump_mag = 0.0
         if dn > 0:
             jump_mag = np.random.normal(mu_j, sigma_j) * dn
@@ -56,6 +57,7 @@ def heston_regime_switching_kernel(
         
         dt_sqrt = np.sqrt(dt)
         v_prev = max(v[t-1], 1e-5)
+        
         dv = kappa * (theta - v_prev) * dt + xi * np.sqrt(v_prev) * dw_v * dt_sqrt
         v[t] = np.abs(v_prev + dv)
         
@@ -72,6 +74,23 @@ class MarketConfig:
     seed: int = 42
     n_stocks: int = 500
     n_sectors: int = 10
+    
+    mu0: float = 0.08
+    kappa0: float = 2.0
+    theta0: float = 0.02
+    xi0: float = 0.3
+    
+    mu1: float = -0.20
+    kappa1: float = 4.0
+    theta1: float = 0.09
+    xi1: float = 0.6
+    
+    p_01: float = 0.005
+    p_10: float = 0.05
+    
+    lambda_j: float = 0.05
+    mu_j: float = -0.02
+    sigma_j: float = 0.02
 
 class MarketSimulator:
     def __init__(self, config: MarketConfig):
@@ -84,10 +103,10 @@ class MarketSimulator:
     def generate_market(self):
         s, v, regimes, jumps, rets = heston_regime_switching_kernel(
             self.n_steps, self.cfg.dt, self.cfg.seed,
-            0.08, 2.0, 0.04, 0.3,
-            -0.20, 4.0, 0.16, 0.6,
-            0.1, 0.4,
-            0.5, -0.05, 0.1
+            self.cfg.mu0, self.cfg.kappa0, self.cfg.theta0, self.cfg.xi0,
+            self.cfg.mu1, self.cfg.kappa1, self.cfg.theta1, self.cfg.xi1,
+            self.cfg.p_01, self.cfg.p_10,
+            self.cfg.lambda_j, self.cfg.mu_j, self.cfg.sigma_j
         )
         
         base_vol = 1e6
@@ -119,11 +138,9 @@ class MarketSimulator:
         np.random.seed(self.cfg.seed)
         
         sectors = np.random.randint(0, self.cfg.n_sectors, self.cfg.n_stocks)
-        
         sector_shocks = np.random.normal(0, 1, (self.n_steps-1, self.cfg.n_sectors))
         
         stock_dfs = {}
-        
         idio_shocks = np.random.normal(0, 1, (self.n_steps-1, self.cfg.n_stocks))
         
         betas = np.random.normal(1.0, 0.3, self.cfg.n_stocks)
@@ -163,17 +180,3 @@ class MarketSimulator:
             stock_dfs[f"STK_{i:04d}"] = df
             
         return stock_dfs
-
-if __name__ == "__main__":
-    config = MarketConfig(T=2, dt=1/252, n_stocks=100)
-    
-    sim = MarketSimulator(config)
-    
-    market_df = sim.generate_market()
-    print(market_df.head())
-    print(f"Market Data Generated. Crises detected: {market_df['Regime'].sum()} days.")
-    
-    stocks = sim.generate_stocks()
-    print(f"Generated {len(stocks)} stock tickers.")
-    
-    # market_df.to_parquet("market.parquet")
