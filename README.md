@@ -4,6 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)]()
+[![Paper](https://img.shields.io/badge/Paper-PDF-red)](https://welcra.com/fsynth.pdf)
 
 **fsynth** is a high-performance Python library for generating realistic, multi-asset financial time series and corresponding fundamental reports. Unlike simple geometric brownian motion (GBM) generators, `fsynth` models the complex statistical properties of real markets—including volatility clustering, fat tails, and regime-dependent correlations—using **Heston Stochastic Volatility** and **Merton Jump Diffusion** processes.
 
