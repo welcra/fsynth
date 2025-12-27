@@ -34,7 +34,7 @@ Standard financial models (Geometric Brownian Motion) assume market returns are 
 * **Standard Model:** ~0.00 (Assumes crashes are impossible)
 * **fsynth Model:** ~5.81 (Successfully models crash risk)
 
---
+---
 
 ## 📦 Installation
 
@@ -178,6 +178,19 @@ Contributions are welcome! Please open an issue to discuss proposed changes or s
 3.  Commit your changes (`git commit -m 'Add some AmazingFeature'`).
 4.  Push to the branch (`git push origin feature/AmazingFeature`).
 5.  Open a Pull Request.
+
+---
+
+## 📜 Citing fsynth
+If you use fsynth in your research, please cite the following preprint:
+
+> Malhotra, A. (2025). *High Fidelity Synthetic Financial Universes Through Regime Switching With Stochastic Volatility and Jump Diffusion*. SSRN.
+
+**Key Findings:**
+* **Kurtosis Benchmark:** While the industry-standard GARCH(1,1) model produces an excess kurtosis of only **0.33**, `fsynth` achieves **5.79**, closely matching the S&P 500's **8.05**.
+* **Solvency Modeling:** Demonstrated ability to simulate "Death Spirals" where macro-regimes trigger reflexive debt crises in high-leverage assets.
+
+[Read the Full Paper (PDF)](https://welcra.com/fsynth.pdf)
 
 ## 📄 License
 
