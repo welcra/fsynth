@@ -2,8 +2,6 @@
 
 [![PyPI version](https://badge.fury.io/py/fsynth.svg)](https://badge.fury.io/py/fsynth)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)]()
 [![Paper](https://img.shields.io/badge/Paper-PDF-red)](https://welcra.com/fsynth.pdf)
 
 **fsynth** is a high-performance Python library for generating realistic, multi-asset financial time series and corresponding fundamental reports. Unlike simple geometric brownian motion (GBM) generators, `fsynth` models the complex statistical properties of real markets—including volatility clustering, fat tails, and regime-dependent correlations—using **Heston Stochastic Volatility** and **Merton Jump Diffusion** processes.
@@ -12,7 +10,7 @@ Designed for quantitative researchers, AI/ML engineers, and financial educators 
 
 ---
 
-## 🚀 Features
+## Features
 
 * **Stochastic Volatility:** Implements the Heston model to simulate time-varying volatility, capturing the "volatility smile" and clustering observed in real markets.
 * **Regime Switching:** Simulates macro-economic states (Bull, Bear, Crisis) that dynamically alter correlation matrices and volatility baselines.
@@ -23,7 +21,7 @@ Designed for quantitative researchers, AI/ML engineers, and financial educators 
 
 ---
 
-## 📊 Why use fsynth? (The "Fat Tail" Problem)
+## Why use fsynth
 
 Standard financial models (Geometric Brownian Motion) assume market returns are Normally Distributed. They fail to capture "Black Swan" events.
 
@@ -31,13 +29,13 @@ Standard financial models (Geometric Brownian Motion) assume market returns are 
 
 ![Fat Tail Analysis](images/spy5y_fsynth.png)
 
-* **Real SPY Kurtosis:** ~8.04 (High risk of crash)
-* **Standard Model:** ~0.00 (Assumes crashes are impossible)
-* **fsynth Model:** ~5.81 (Successfully models crash risk)
+* **Real SPY Kurtosis:** ~8.04
+* **Standard Model:** ~0.00
+* **fsynth Model:** ~5.81
 
 ---
 
-## 📦 Installation
+## Installation
 
 ```bash
 pip install fsynth
@@ -53,19 +51,19 @@ pip install -e .
 
 ---
 
-## ⚡ Quick Start
+## Quick Start
 
 ### 1. The Command Line Interface (CLI)
 
-The easiest way to generate a dataset is using the bundled CLI tool. **New in v0.1.1:** You can now tune the Heston volatility and Jump Diffusion parameters directly from the command line to simulate different market conditions (e.g., "Crypto Winter" vs. "Stable Bull Market").
+The easiest way to generate a dataset is using the bundled CLI tool. **New in v0.1.1:** You can now tune the Heston volatility and Jump Diffusion parameters directly from the command line to simulate different market conditions.
 
-**Generate a standard SPY-like dataset (Stable, rare crashes):**
+**Generate a standard SPY-like dataset:**
 
 ```bash
 fsynth-gen --stocks 500 --years 10 --out data --theta 0.02 --lambda_j 0.05
 ```
 
-**Generate a high-volatility "Crypto" dataset (Frequent 5% crashes):**
+**Generate a high-volatility dataset:**
 
 ```bash
 fsynth-gen --stocks 100 --years 5 --theta 0.10 --lambda_j 0.50 --crash_size -0.05
@@ -79,7 +77,7 @@ New CLI Flags:
 
 Output:
 - ```data/market_index.parquet```: The macro-economic backbone (regimes, risk-free rates).
-- ```data/stock_prices.parquet```: OHLCV data for all 500 tickers (~1.2M rows).
+- ```data/stock_prices.parquet```: OHLCV data for all 500 tickers.
 - ```data/fundamentals.parquet```: Quarterly financial reports for all tickers.
 
 ### 2. Python API
@@ -96,21 +94,19 @@ config = MarketConfig(
     dt=1/252,           # Daily time steps
     n_stocks=100,       # Number of tickers
     n_sectors=5,        # Distinct sectors
-    seed=42,            # Reproducibility
+    seed=42,
     
-    # -- New Tuning Parameters --
-    theta0=0.02,        # Low baseline volatility (SPY-like)
-    lambda_j=0.05,      # ~12 jumps per year
+    # New Tuning Parameters
+    theta0=0.02,        # Low baseline volatility
+    lambda_j=0.05,      # Around 12 jumps per year
     mu_j=-0.02,         # Average jump size is -2%
     p_01=0.005          # 0.5% chance of entering Crisis regime daily
 )
 
 # 2. Run the Engine
 sim = MarketSimulator(config)
-print("Generating Market Backbone...")
 market_df = sim.generate_market()
 
-print("Generating Asset Paths...")
 stock_dfs = sim.generate_stocks()
 
 # 3. Aggregate Data
@@ -130,9 +126,9 @@ print(f"Generated {len(all_prices)} price rows and {len(fundamentals_df)} report
 
 ---
 
-## 🧮 Mathematical Methodology
+## Mathematical Methodology
 
-`fsynth` moves beyond standard Random Walk theories to capture the nuanced risks of real financial markets.
+`fsynth` moves beyond standard Random Walk theories to capture the nuanced risks of real markets.
 
 ### The Heston Model
 We model the spot price $S_t$ and its variance $v_t$ using the following system of stochastic differential equations (SDEs):
@@ -156,7 +152,7 @@ A Hidden Markov Model (HMM) governs the transition between `Bull`, `Bear`, and `
 
 ---
 
-## 📂 Data Structure
+## Data Structure
 
 ### Stock Prices (OHLCV)
 | Date | Ticker | Open | High | Low | Close | Volume | Regime |
@@ -170,30 +166,18 @@ A Hidden Markov Model (HMM) governs the transition between `Bull`, `Bear`, and `
 
 ---
 
-## 🤝 Contributing
-
-Contributions are welcome! Please open an issue to discuss proposed changes or submit a Pull Request.
-
-1.  Fork the repository.
-2.  Create your feature branch (`git checkout -b feature/AmazingFeature`).
-3.  Commit your changes (`git commit -m 'Add some AmazingFeature'`).
-4.  Push to the branch (`git push origin feature/AmazingFeature`).
-5.  Open a Pull Request.
-
----
-
-## 📜 Citing fsynth
+## Citing fsynth
 If you use fsynth in your research, please cite the following preprint:
 
 > Malhotra, A. (2025). *High Fidelity Synthetic Financial Universes Through Regime Switching With Stochastic Volatility and Jump Diffusion*. SSRN.
 
 **Key Findings:**
-* **Kurtosis Benchmark:** While the industry-standard GARCH(1,1) model produces an excess kurtosis of only **0.33**, `fsynth` achieves **5.79**, closely matching the S&P 500's **8.05**.
-* **Solvency Modeling:** Demonstrated ability to simulate "Death Spirals" where macro-regimes trigger reflexive debt crises in high-leverage assets.
+* **Kurtosis Benchmark:** While the standard GARCH(1,1) model produces an excess kurtosis of only **0.33**, `fsynth` achieves **5.79**, closely matching the S&P 500's **8.05**.
+* **Solvency Modeling:** Demonstrated ability to simulate Death Spirals, where macro-regimes trigger reflexive debt crises in high-leverage assets.
 
-[Read the Full Paper (PDF)](https://welcra.com/fsynth.pdf)
+[Read the Full Paper](https://welcra.com/fsynth.pdf)
 
-## 📄 License
+## License
 
 Distributed under the MIT License. See `LICENSE` for more information.
 
